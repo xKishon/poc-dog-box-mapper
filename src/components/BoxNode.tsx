@@ -1,14 +1,16 @@
 import { memo, useState } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 import { motion } from 'framer-motion';
-import { BoxNodeData } from '../types';
+import { BoxNodeData, Dog } from '../types';
+import { confirmWithToast } from '../utils/toast';
 
-function BoxNode({ data }: NodeProps<BoxNodeData>) {
-  const { id, name, description, color, capacity, dogs, isHighlighted, onDogDrop, onDogRemove, onDogEdit, onBoxEdit, onBoxDelete } = data;
+function BoxNode({ data }: NodeProps) {
+  const boxData = data as BoxNodeData;
+  const { id, name, description, color, capacity, dogs, onDogDrop, onDogRemove, onDogEdit, onBoxEdit, onBoxDelete } = boxData;
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Default to amber if no color specified
-  const boxColor = color || '#fbbf24';
+  // Default to slate if no color specified
+  const boxColor = color || '#64748b';
 
   // Check if box is full
   const isFull = capacity ? dogs.length >= capacity : false;
@@ -54,26 +56,28 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
       animate={{
         scale: isDragOver ? 1.05 : 1,
         boxShadow: isDragOver
-          ? '0 0 0 3px rgba(59, 130, 246, 0.5)'
-          : '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+          ? '0 0 0 4px rgba(251, 146, 60, 0.4), 0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+          : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       style={{
-        background: `linear-gradient(to bottom right, ${boxColor}20, ${boxColor}40)`,
-        borderColor: isDragOver ? '#3b82f6' : boxColor,
+        background: `linear-gradient(135deg, ${boxColor}15, ${boxColor}30, ${boxColor}20)`,
+        borderColor: isDragOver ? '#fb923c' : boxColor,
       }}
-      className={`p-4 border-2 rounded-lg min-w-[280px] max-w-[380px]`}
+      className={`p-5 border-3 rounded-2xl min-w-[280px] max-w-[380px] backdrop-blur-sm`}
     >
       <Handle type="target" position={Position.Top} className="opacity-0" />
 
-      <div className="mb-3 box-header drag-handle cursor-move">
+      <div className="mb-3 box-header drag-handle cursor-move bg-white/50 rounded-xl p-3 -m-1">
         <div className="flex items-start justify-between gap-2 mb-1">
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-lg text-amber-900 break-words">{name}</h3>
+            <h3 className="font-bold text-xl break-words" style={{ color: boxColor }}>
+              {name}
+            </h3>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Capacity indicator */}
-            <div className={`flex items-center gap-1 text-xs font-semibold ${isFull ? 'text-red-600' : 'text-amber-700'}`}>
+            <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${isFull ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}`}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
               </svg>
@@ -85,7 +89,7 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
                 e.stopPropagation();
                 onBoxEdit(id);
               }}
-              className="text-amber-600 hover:text-amber-800 hover:bg-amber-200 rounded p-1 transition-colors"
+              className="text-slate-600 hover:text-slate-800 bg-white/80 hover:bg-white rounded-full p-1.5 transition-all shadow-sm hover:shadow"
               title="Modifica box"
             >
               <svg
@@ -100,11 +104,12 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (window.confirm(`Sei sicuro di voler eliminare il box "${name}"? I cani verranno spostati nei non assegnati.`)) {
-                  onBoxDelete(id);
-                }
+                confirmWithToast(
+                  `Sei sicuro di voler eliminare il box "${name}"? I cani verranno spostati nei non assegnati.`,
+                  () => onBoxDelete(id)
+                );
               }}
-              className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded p-1 transition-colors"
+              className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-full p-1.5 transition-all shadow-sm hover:shadow"
               title="Elimina box"
             >
               <svg
@@ -119,15 +124,20 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
           </div>
         </div>
         {description && (
-          <p className="text-xs text-amber-600 mb-2 break-words">{description}</p>
+          <p className="text-xs opacity-75 mt-2 break-words font-medium" style={{ color: boxColor }}>
+            {description}
+          </p>
         )}
       </div>
 
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {dogs.length === 0 ? (
-          <p className="text-xs text-amber-600 italic py-2 box-header">Box vuoto</p>
+          <div className="text-center py-6 box-header">
+            <span className="text-3xl block mb-2">🏠</span>
+            <p className="text-xs text-gray-500 italic font-medium">Box vuoto</p>
+          </div>
         ) : (
-          dogs.map((dog) => (
+          dogs.map((dog: Dog) => (
             <div
               key={dog.id}
               draggable
@@ -135,7 +145,7 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
                 e.dataTransfer.setData('dogId', dog.id);
                 e.dataTransfer.effectAllowed = 'move';
               }}
-              className="dog-card nodrag text-sm p-2.5 rounded shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all bg-white hover:bg-gray-50"
+              className="dog-card nodrag text-sm p-3 rounded-xl shadow-md cursor-grab active:cursor-grabbing hover:shadow-xl transition-all bg-white hover:bg-slate-50 border-2 border-slate-100"
             >
               <div className="flex items-start gap-2">
                 {dog.image ? (
@@ -162,7 +172,7 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
                           onDogEdit(dog.id);
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded p-1 transition-colors"
+                        className="text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-all shadow-sm hover:shadow"
                         title="Modifica cane"
                       >
                         <svg
@@ -180,7 +190,7 @@ function BoxNode({ data }: NodeProps<BoxNodeData>) {
                           onDogRemove(dog.id);
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded p-1 transition-colors"
+                        className="text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 rounded-full p-1.5 transition-all shadow-sm hover:shadow"
                         title="Rimuovi dal box"
                       >
                         <svg

@@ -1,4 +1,4 @@
-# 🐾 POC — PawPlan: Visual Dashboard per Pensione Cani
+# 🐾 POC — Dog Box Planner: Visual Dashboard per Pensione Cani
 
 ## 🎯 Obiettivo
 Creare una **mappa visiva interattiva e strutturata** per rappresentare i box e i cani ospitati in una pensione, utile all’amministratore per:
@@ -164,7 +164,7 @@ Nessun servizio a pagamento richiesto. Il progetto può vivere su **Vercel, Netl
 ---
 
 ## 🧠 Conclusione
-Il POC **PawPlan** con **React Flow** è la soluzione ideale per rappresentare dati strutturati (box ↔ cani) in modo visivo e interattivo.
+Il POC **Dog Box Planner** con **React Flow** è la soluzione ideale per rappresentare dati strutturati (box ↔ cani) in modo visivo e interattivo.
 
 Grazie alle funzioni magnetiche, alla planimetria reale e alla facilità di integrazione con Laravel, offre un’esperienza gestionale fluida, moderna e completamente gratuita.
 

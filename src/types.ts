@@ -21,7 +21,7 @@ export interface Box {
   color?: string;
 }
 
-export interface BoxNodeData {
+export interface BoxNodeData extends Record<string, unknown> {
   id: string;
   name: string;
   description?: string;

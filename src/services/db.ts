@@ -1,13 +1,14 @@
+// @ts-ignore - sql.js doesn't have built-in TypeScript types
 import initSqlJs, { Database } from 'sql.js';
 import { Box, Dog } from '../types';
 
-const DB_KEY = 'pawplan_db';
+const DB_KEY = 'Dog Box Planner_db';
 
 let db: Database | null = null;
 
 export async function initDatabase(): Promise<void> {
   const SQL = await initSqlJs({
-    locateFile: (file) => `https://sql.js.org/dist/${file}`,
+    locateFile: (file: string) => `https://sql.js.org/dist/${file}`,
   });
 
   // Try to load existing database from localStorage
@@ -58,13 +59,13 @@ function createTables(): void {
 function insertMockData(): void {
   if (!db) return;
 
-  // Insert mock boxes
+  // Insert mock boxes - colori professionali e saturi
   const mockBoxes = [
-    { id: 'box-1', name: 'Box A', description: 'Box per cani di taglia grande', x: 100, y: 100, capacity: 3, color: '#fbbf24' },
-    { id: 'box-2', name: 'Box B', description: 'Box per cani di taglia media', x: 400, y: 100, capacity: 2, color: '#60a5fa' },
-    { id: 'box-3', name: 'Box C', description: 'Box con accesso al giardino', x: 100, y: 300, capacity: 4, color: '#34d399' },
-    { id: 'box-4', name: 'Box D', description: 'Box climatizzato', x: 400, y: 300, capacity: 2, color: '#f472b6' },
-    { id: 'box-5', name: 'Box E', description: 'Box VIP con cuccia premium', x: 700, y: 200, capacity: 3, color: '#a78bfa' },
+    { id: 'box-1', name: 'Box A', description: 'Box per cani di taglia grande', x: 100, y: 100, capacity: 3, color: '#0ea5e9' }, // Sky blue
+    { id: 'box-2', name: 'Box B', description: 'Box per cani di taglia media', x: 400, y: 100, capacity: 2, color: '#8b5cf6' }, // Violet
+    { id: 'box-3', name: 'Box C', description: 'Box con accesso al giardino', x: 100, y: 300, capacity: 4, color: '#10b981' }, // Emerald
+    { id: 'box-4', name: 'Box D', description: 'Box climatizzato', x: 400, y: 300, capacity: 2, color: '#f59e0b' }, // Amber
+    { id: 'box-5', name: 'Box E', description: 'Box VIP con cuccia premium', x: 700, y: 200, capacity: 3, color: '#ec4899' }, // Pink
   ];
 
   mockBoxes.forEach((box) => {
@@ -108,7 +109,7 @@ export function getBoxes(): Box[] {
   const result = db.exec('SELECT * FROM boxes');
   if (result.length === 0) return [];
 
-  return result[0].values.map((row) => ({
+  return result[0].values.map((row: any[]) => ({
     id: row[0] as string,
     name: row[1] as string,
     description: row[2] as string | undefined,
@@ -125,7 +126,7 @@ export function getDogs(): Dog[] {
   const result = db.exec('SELECT * FROM dogs');
   if (result.length === 0) return [];
 
-  return result[0].values.map((row) => ({
+  return result[0].values.map((row: any[]) => ({
     id: row[0] as string,
     name: row[1] as string,
     breed: row[2] as string | undefined,
